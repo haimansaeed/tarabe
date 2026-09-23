@@ -1,0 +1,37 @@
+<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>طرب - محاكي Suno أونلاين</title><style>*{box-sizing:border-box}body{margin:0;background:#0a0a0a;color:#fff;font-family:system-ui;display:flex;height:100vh}.side{width:340px;background:#121212;border-left:1px solid #232323;padding:16px;overflow:auto}.main{flex:1;background:#000;padding:20px;overflow:auto}.logo{font-weight:900;font-size:20px;margin-bottom:16px}.label{font-size:12px;color:#a1a1aa;margin:12px 0 6px;display:block}.input,textarea,select{width:100%;background:#1e1e1e;color:#fff;border:1px solid #2a2a2a;border-radius:10px;padding:12px;font-size:14px}textarea{min-height:80px}.btn{width:100%;background:#22c55e;color:#000;border:none;border-radius:24px;padding:14px;font-weight:900;font-size:16px;cursor:pointer;margin-top:16px}.card{background:#18181b;border:1px solid #27272a;border-radius:12px;padding:12px;margin:12px 0;display:flex;gap:12px;align-items:center}.cover{width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg,#d4af37,#8b5cf6);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900}.log{background:#000;border:1px solid #222;border-radius:8px;padding:10px;font-family:monospace;font-size:12px;color:#22c55e;min-height:60px;white-space:pre-wrap;direction:ltr;text-align:left;margin-top:12px}</style></head><body>
+<div class="side">
+<div class="logo">🎵 طرب <span style="color:#d4af37">SUNO</span></div>
+<div class="label">🔑 مفتاح HuggingFace المجاني (أونلاين)</div>
+<input id="hfkey" type="password" placeholder="hf_... من huggingface.co/settings/tokens">
+<div style="font-size:11px;color:#71717a">مجاني: huggingface.co → سجل → Settings → Tokens → New Token</div>
+<div class="label">📝 وصف الأغنية</div>
+<textarea id="desc">حبيبي هيمان وينك من زمان - أغنية خليجية حزينة عود، صوت رجالي عميق</textarea>
+<div class="label">🎼 Style</div>
+<input id="style" value="خليجي حزين, عود, إيقاع خبيتي, صوت رجالي عميق">
+<div class="label">📌 العنوان</div>
+<input id="title" value="وينك من زمان">
+<div class="label">⏱️ المدة</div>
+<select id="dur"><option value="15">15 ثانية</option><option value="30" selected>30 ثانية</option><option value="60">60 ثانية</option></select>
+<button class="btn" id="createBtn" onclick="generateOnline()">✨ Create - ولّد مثل Suno</button>
+<div class="log" id="log">> محاكي Suno أونلاين جاهز...
+> الصق مفتاح hf_ المجاني
+> ثم اضغط Create</div>
+</div>
+<div class="main"><h2 style="margin:0">مكتبتك</h2><div id="library"><div class="card"><div class="cover">ط</div><div style="flex:1"><div style="font-weight:700">مرحبا - محاكي Suno</div><div style="font-size:12px;color:#a1a1aa">الصق مفتاح hf_ واضغط Create</div></div></div></div></div>
+<script>
+async function generateOnline(){
+let key=document.getElementById('hfkey').value.trim(),desc=document.getElementById('desc').value,style=document.getElementById('style').value,title=document.getElementById('title').value,dur=document.getElementById('dur').value,logEl=document.getElementById('log'),btn=document.getElementById('createBtn'),lib=document.getElementById('library');
+if(!key.startsWith('hf_')){logEl.textContent='> ❌ الصق مفتاح hf_ المجاني من huggingface.co/settings/tokens';return;}
+btn.disabled=true;btn.textContent='⏳ جاري التوليد أونلاين مثل Suno... (30-60 ثانية)';
+logEl.textContent='> Connecting to Suno backend...\n> Model: musicgen-large\n> Prompt: '+desc.slice(0,60);
+try{
+let res=await fetch('https://api-inference.huggingface.co/models/facebook/musicgen-stereo-large',{method:'POST',headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify({inputs:desc+' , '+style})});
+if(!res.ok){let txt=await res.text();logEl.textContent='> ❌ '+txt.slice(0,300)+'\n> شغل VPN - HuggingFace محجوب في اليمن';btn.disabled=false;btn.textContent='✨ Create';return;}
+let blob=await res.blob(),url=URL.createObjectURL(blob);
+let card=document.createElement('div');card.className='card';
+card.innerHTML=`<div class="cover">${title[0]}</div><div style="flex:1"><div style="font-weight:700">${title} <span style="font-size:10px;background:#22c55e;color:#000;padding:2px 6px;border-radius:4px">أونلاين</span></div><div style="font-size:12px;color:#a1a1aa">${desc.slice(0,70)}</div><audio controls src="${url}" style="width:100%;margin-top:6px"></audio><div style="margin-top:6px"><a href="${url}" download="${title}.wav" style="font-size:12px;background:#27272a;color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">⬇️ تحميل</a></div></div>`;
+lib.prepend(card);logEl.textContent+='\n> ✅ اكتمل! أونلاين مثل Suno';
+}catch(e){logEl.textContent='> ❌ '+e.message+' - شغل VPN';}
+btn.disabled=false;btn.textContent='✨ Create - ولّد مثل Suno';
+}
+</script></body></html>
